@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pode Confiar?</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #1a1a2e; min-height: 100vh; }
+
+    #telaAuth {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    }
+
+    .auth-box {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .auth-logo { text-align: center; margin-bottom: 28px; }
+    .auth-logo h1 { font-size: 26px; color: #1a1a2e; margin-bottom: 6px; }
+    .auth-logo p { font-size: 13px; color: #888; }
+
+    .auth-tabs {
+      display: flex;
+      background: #f0f4f8;
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+
+    .auth-tabs button {
+      flex: 1; padding: 10px; border: none; background: none;
+      border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; color: #888; transition: all 0.2s; width: auto;
+    }
+
+    .auth-tabs button.active {
+      background: white; color: #e63946;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+
+    label { font-size: 13px; font-weight: 600; color: #444; margin-bottom: 5px; display: block; }
+
+    input, select, textarea {
+      width: 100%; padding: 11px 14px;
+      border: 1.5px solid #e0e0e0; border-radius: 10px;
+      font-size: 14px; outline: none; transition: border 0.2s; margin-bottom: 14px;
+    }
+
+    input:focus, select:focus, textarea:focus { border-color: #e63946; }
+
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .btn {
+      width: 100%; padding: 13px; background: #e63946; color: white;
+      border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: background 0.2s; margin-top: 4px;
+    }
+    .btn:hover { background: #c1121f; }
+
+    .alert-auth { padding: 12px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 16px; display: none; }
+    .alert-auth.error { background: #ffe0e0; color: #c1121f; display: block; }
+    .alert-auth.success { background: #d4edda; color: #155724; display: block; }
+
+    #telaApp { display: none; }
+
+    header {
+      background: #1a1a2e; color: white; padding: 16px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    header h1 { font-size: 20px; font-weight: 700; }
+    .header-user { display: flex; align-items: center; gap: 12px; }
+    .header-user span { font-size: 14px; color: #ccc; }
+
+    .btn-sair {
+      padding: 8px 16px; background: transparent; color: #ccc;
+      border: 1px solid #444; border-radius: 8px; font-size: 13px;
+      cursor: pointer; width: auto; transition: all 0.2s;
+    }
+    .btn-sair:hover { background: #e63946; color: white; border-color: #e63946; }
+
+    nav {
+      background: white; display: flex; gap: 4px;
+      padding: 0 40px; border-bottom: 1px solid #e0e0e0;
+    }
+    nav button {
+      padding: 14px 20px; border: none; background: none; cursor: pointer;
+      font-size: 14px; color: #666; border-bottom: 3px solid transparent;
+      transition: all 0.2s; width: auto;
+    }
+    nav button.active { color: #e63946; border-bottom-color: #e63946; font-weight: 600; }
+
+    .page { display: none; padding: 40px; max-width: 800px; margin: 0 auto; }
+    .page.active { display: block; }
+
+    .card {
+      background: white; border-radius: 16px; padding: 32px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 24px;
+    }
+    .card h2 { font-size: 18px; margin-bottom: 8px; color: #1a1a2e; }
+    .card > p { font-size: 14px; color: #666; margin-bottom: 20px; }
+
+    .input-group { display: flex; gap: 12px; margin-bottom: 20px; }
+    .input-group input { margin-bottom: 0; }
+
+    .btn-buscar {
+      padding: 12px 28px; background: #e63946; color: white; border: none;
+      border-radius: 10px; font-size: 14px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; width: auto;
+    }
+    .btn-buscar:hover { background: #c1121f; }
+
+    .resultado { margin-top: 20px; padding: 20px; border-radius: 12px; display: none; }
+    .resultado.golpe { background: #fff0f0; border: 2px solid #e63946; }
+    .resultado.seguro { background: #f0fff4; border: 2px solid #2dc653; }
+    .resultado h3 { font-size: 16px; margin-bottom: 6px; }
+    .resultado p { font-size: 14px; margin: 0; color: #444; }
+
+    .form-page-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .alert-inline { padding: 14px 18px; border-radius: 10px; font-size: 14px; margin-top: 12px; display: none; }
+    .alert-inline.success { background: #d4edda; color: #155724; display: block; }
+    .alert-inline.error { background: #ffe0e0; color: #c1121f; display: block; }
+
+    .btn-form {
+      padding: 12px 28px; background: #e63946; color: white; border: none;
+      border-radius: 10px; font-size: 14px; font-weight: 600;
+      cursor: pointer; width: auto; margin-top: 8px;
+    }
+    .btn-form:hover { background: #c1121f; }
+
+    /* SIMULADO */
+    .sim-progress-bar {
+      width: 100%; height: 8px; background: #e0e0e0;
+      border-radius: 4px; margin-bottom: 8px; overflow: hidden;
+    }
+    .sim-progress-fill {
+      height: 100%; background: #e63946;
+      border-radius: 4px; transition: width 0.4s ease;
+    }
+    .sim-counter { font-size: 13px; color: #888; margin-bottom: 24px; }
+
+    .sim-pergunta {
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .sim-texto {
+      font-size: 16px; color: #1a1a2e; line-height: 1.6;
+      background: #f8f9fa; border-left: 4px solid #e63946;
+      padding: 20px; border-radius: 0 12px 12px 0; margin-bottom: 24px;
+    }
+
+    .sim-botoes { display: flex; gap: 12px; margin-bottom: 16px; }
+
+    .sim-btn {
+      flex: 1; padding: 14px; border: 2px solid #e63946;
+      background: white; color: #e63946; border-radius: 12px;
+      font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; width: auto;
+    }
+    .sim-btn:hover { background: #fff0f0; }
+    .sim-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .sim-btn.selecionado-certo { background: #d4edda; border-color: #2dc653; color: #155724; }
+    .sim-btn.selecionado-errado { background: #ffe0e0; border-color: #e63946; color: #c1121f; }
+
+    .sim-feedback {
+      padding: 16px 20px; border-radius: 12px; font-size: 14px;
+      line-height: 1.5; display: none; animation: fadeIn 0.3s ease;
+    }
+    .sim-feedback.acertou { background: #f0fff4; border: 1.5px solid #2dc653; color: #155724; }
+    .sim-feedback.errou { background: #fff0f0; border: 1.5px solid #e63946; color: #c1121f; }
+
+    .sim-avancar {
+      display: none; width: 100%; margin-top: 16px; padding: 13px;
+      background: #1a1a2e; color: white; border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+    }
+    .sim-avancar:hover { background: #e63946; }
+
+    .sim-resultado {
+      text-align: center; padding: 32px 24px;
+      border-radius: 16px; animation: fadeIn 0.5s ease;
+    }
+    .sim-resultado h2 { font-size: 22px; margin: 12px 0 8px; }
+    .sim-resultado p { font-size: 15px; color: #555; margin-bottom: 20px; }
+
+    .sim-erros { margin-top: 24px; text-align: left; }
+    .sim-erros h3 { font-size: 16px; margin-bottom: 12px; color: #1a1a2e; }
+    .sim-erro-item {
+      background: #fff0f0; border: 1px solid #ffcdd2;
+      border-radius: 10px; padding: 14px; margin-bottom: 10px;
+    }
+    .sim-erro-item p { font-size: 14px; margin: 0 0 6px; color: #333; font-style: italic; }
+    .sim-erro-item span { font-size: 13px; color: #c1121f; }
+  </style>
+</head>
+<body>
+
+<!-- TELA DE LOGIN / CADASTRO -->
+<div id="telaAuth">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <h1>🛡️ Pode Confiar?</h1>
+      <p>Plataforma de prevenção contra golpes digitais</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="active" onclick="trocarAuth('login', this)">Entrar</button>
+      <button onclick="trocarAuth('registro', this)">Cadastrar</button>
+    </div>
+    <div id="login" class="auth-form active">
+      <div id="erroLogin" class="alert-auth"></div>
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="seu@email.com" />
+      <label>Senha</label>
+      <input type="password" id="loginSenha" placeholder="Sua senha" />
+      <button class="btn" onclick="fazerLogin()">Entrar</button>
+    </div>
+    <div id="registro" class="auth-form">
+      <div id="erroRegistro" class="alert-auth"></div>
+      <label>Nome completo</label>
+      <input type="text" id="regNome" placeholder="Seu nome completo" />
+      <div class="form-row-2">
+        <div><label>Email</label><input type="email" id="regEmail" placeholder="seu@email.com" /></div>
+        <div><label>Telefone</label><input type="text" id="regTelefone" placeholder="(11) 99999-0000" /></div>
+      </div>
+      <div class="form-row-2">
+        <div><label>CPF</label><input type="text" id="regCpf" placeholder="000.000.000-00" /></div>
+        <div><label>Data de nascimento</label><input type="date" id="regDataNascimento" /></div>
+      </div>
+      <div class="form-row-2">
+        <div><label>Senha</label><input type="password" id="regSenha" placeholder="Crie uma senha" /></div>
+        <div><label>Confirmar senha</label><input type="password" id="regConfirmarSenha" placeholder="Repita a senha" /></div>
+      </div>
+      <button class="btn" onclick="fazerCadastro()">Criar conta</button>
+    </div>
+  </div>
+</div>
+
+<!-- SISTEMA PRINCIPAL -->
+<div id="telaApp">
+  <header>
+    <h1>🛡️ Pode Confiar?</h1>
+    <div class="header-user">
+      <span id="nomeUsuario"></span>
+      <button class="btn-sair" onclick="sair()">Sair</button>
+    </div>
+  </header>
+  <nav>
+    <button class="active" onclick="trocarPagina('verificar', this)">Verificar Número</button>
+    <button onclick="trocarPagina('denunciar', this)">Denunciar</button>
+    <button onclick="trocarPagina('simulacao', this)">Simulação</button>
+  </nav>
+
+  <!-- VERIFICAR -->
+  <div id="verificar" class="page active">
+    <div class="card">
+      <h2>Verificar número suspeito</h2>
+      <p>Digite o número que ligou para você e descubra se já foi denunciado.</p>
+      <div class="input-group">
+        <input type="text" id="inputNumero" placeholder="Ex: 11999990001" />
+        <button class="btn-buscar" onclick="verificarNumero()">Verificar</button>
+      </div>
+      <div id="resultadoVerificacao" class="resultado">
+        <h3 id="resultadoTitulo"></h3>
+        <p id="resultadoTexto"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DENUNCIAR -->
+  <div id="denunciar" class="page">
+    <div class="card">
+      <h2>📢 Registrar denúncia</h2>
+      <p>Preencha as informações abaixo. Quanto mais detalhes, melhor para proteger outras pessoas!</p>
+
+      <label>Número que entrou em contato com você *</label>
+      <input type="text" id="denNumero" placeholder="Ex: 11999990004" />
+
+      <label>Como entraram em contato? *</label>
+      <select id="denTipoContato">
+        <option value="">Selecione...</option>
+        <option value="Ligação telefônica">📞 Ligação telefônica</option>
+        <option value="WhatsApp">💬 WhatsApp</option>
+        <option value="SMS">📱 SMS</option>
+        <option value="Outro">Outro</option>
+      </select>
+
+      <label>Que tipo de golpe foi? *</label>
+      <select id="denTipoGolpe">
+        <option value="">Selecione...</option>
+        <option value="Falsa central bancária">🏦 Falsa central bancária (fingiu ser do banco)</option>
+        <option value="Golpe do Pix">💸 Golpe do Pix (pediu transferência)</option>
+        <option value="Golpe do familiar em apuros">👨‍👩‍👧 Familiar em apuros (fingiu ser parente precisando de dinheiro)</option>
+        <option value="Link falso">🔗 Link falso (mandou link suspeito)</option>
+        <option value="Falso prêmio">🎁 Falso prêmio (disse que você ganhou algo)</option>
+        <option value="Golpe do motoboy">🏍️ Golpe do motoboy (pediu para entregar cartão)</option>
+        <option value="Outro">Outro</option>
+      </select>
+
+      <label>Qual banco o golpista mencionou?</label>
+      <select id="denBanco">
+        <option value="">Nenhum / Não mencionou</option>
+        <option value="Bradesco">Bradesco</option>
+        <option value="Itaú">Itaú</option>
+        <option value="Banco do Brasil">Banco do Brasil</option>
+        <option value="Caixa Econômica">Caixa Econômica</option>
+        <option value="Nubank">Nubank</option>
+        <option value="Santander">Santander</option>
+        <option value="Inter">Inter</option>
+        <option value="Outro banco">Outro banco</option>
+      </select>
+
+      <label>O que o golpista pediu?</label>
+      <select id="denOQuePediu">
+        <option value="">Selecione...</option>
+        <option value="Senha do cartão ou conta">🔑 Senha do cartão ou conta</option>
+        <option value="Código SMS ou token">📲 Código SMS ou token</option>
+        <option value="Transferência via Pix">💸 Transferência via Pix</option>
+        <option value="Dados pessoais (CPF, endereço)">📋 Dados pessoais (CPF, endereço)</option>
+        <option value="Instalação de aplicativo">📥 Instalação de aplicativo</option>
+        <option value="Entrega do cartão físico">💳 Entrega do cartão físico</option>
+        <option value="Não pediu nada ainda">Não pediu nada ainda</option>
+      </select>
+
+      <label>Data em que aconteceu</label>
+      <input type="date" id="denData" />
+
+      <label>Descreva o que aconteceu (opcional)</label>
+      <textarea id="denDescricao" rows="3" placeholder="Conte com suas palavras o que aconteceu..."></textarea>
+
+      <button class="btn-form" onclick="registrarDenuncia()">Registrar denúncia</button>
+      <div id="alertaDenuncia" class="alert-inline"></div>
+    </div>
+  </div>
+  <!-- SIMULAÇÃO -->
+  <div id="simulacao" class="page">
+    <div class="card" id="simInicio">
+      <h2>🎯 Simulação de golpes</h2>
+      <p>Teste seus conhecimentos com perguntas baseadas no seu perfil. Uma pergunta por vez!</p>
+      <button class="btn-form" onclick="iniciarSimulacao()">Iniciar simulação</button>
+    </div>
+
+    <div class="card" id="simJogo" style="display:none;">
+      <div class="sim-progress-bar"><div class="sim-progress-fill" id="progressFill"></div></div>
+      <div class="sim-counter" id="simCounter"></div>
+      <div id="simPergunta" class="sim-pergunta"></div>
+    </div>
+
+    <div id="simResultado" style="display:none;"></div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:8080';
+  let usuarioLogado = null;
+  let perguntas = [];
+  let indexAtual = 0;
+  let pontuacao = 0;
+  let erros = [];
+
+  function trocarAuth(id, btn) {
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+    document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  async function fazerLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const senha = document.getElementById('loginSenha').value.trim();
+    const erro = document.getElementById('erroLogin');
+    erro.className = 'alert-auth';
+    if (!email || !senha) { erro.textContent = 'Preencha email e senha!'; erro.className = 'alert-auth error'; return; }
+    try {
+      const res = await fetch(`${API}/api/usuarios/login`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+      });
+      if (res.ok) { usuarioLogado = await res.json(); entrarNoApp(); }
+      else { erro.textContent = 'Email ou senha incorretos.'; erro.className = 'alert-auth error'; }
+    } catch(e) { erro.textContent = 'Erro ao conectar.'; erro.className = 'alert-auth error'; }
+  }
+
+  async function fazerCadastro() {
+    const nome = document.getElementById('regNome').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const telefone = document.getElementById('regTelefone').value.trim();
+    const cpf = document.getElementById('regCpf').value.trim();
+    const dataNascimento = document.getElementById('regDataNascimento').value;
+    const senha = document.getElementById('regSenha').value.trim();
+    const confirmarSenha = document.getElementById('regConfirmarSenha').value.trim();
+    const erro = document.getElementById('erroRegistro');
+    erro.className = 'alert-auth';
+    if (!nome || !email || !telefone || !cpf || !dataNascimento || !senha) {
+      erro.textContent = 'Preencha todos os campos!'; erro.className = 'alert-auth error'; return;
+    }
+    if (senha !== confirmarSenha) {
+      erro.textContent = 'As senhas não coincidem!'; erro.className = 'alert-auth error'; return;
+    }
+    const nascimento = new Date(dataNascimento);
+    const hoje = new Date();
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const m = hoje.getMonth() - nascimento.getMonth();
+    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) idade--;
+    let perfil = 'adulto';
+    if (idade <= 17) perfil = 'jovem';
+    else if (idade > 59) perfil = 'idoso';
+    try {
+      const res = await fetch(`${API}/api/usuarios`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, email, telefone, cpf, dataNascimento, senha, idade, perfil })
+      });
+      if (res.ok) { usuarioLogado = await res.json(); entrarNoApp(); }
+      else { erro.textContent = 'Email ou CPF já cadastrado.'; erro.className = 'alert-auth error'; }
+    } catch(e) { erro.textContent = 'Erro ao conectar.'; erro.className = 'alert-auth error'; }
+  }
+
+  function entrarNoApp() {
+    document.getElementById('telaAuth').style.display = 'none';
+    document.getElementById('telaApp').style.display = 'block';
+    document.getElementById('nomeUsuario').textContent = `Olá, ${usuarioLogado.nome.split(' ')[0]}!`;
+  }
+
+  function sair() {
+    usuarioLogado = null;
+    document.getElementById('telaAuth').style.display = 'flex';
+    document.getElementById('telaApp').style.display = 'none';
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginSenha').value = '';
+  }
+
+  function trocarPagina(id, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  async function verificarNumero() {
+    const numero = document.getElementById('inputNumero').value.trim();
+    if (!numero) return alert('Digite um número!');
+    const div = document.getElementById('resultadoVerificacao');
+    try {
+      const res = await fetch(`${API}/api/numeros/verificar/${numero}`);
+      const text = await res.text();
+      div.style.display = 'block';
+      try {
+        const data = JSON.parse(text);
+        if (data.id) {
+          div.className = 'resultado golpe';
+          document.getElementById('resultadoTitulo').innerHTML = '🚨 ATENÇÃO: Número suspeito!';
+          document.getElementById('resultadoTexto').innerHTML =
+            `Tipo de golpe: <strong>${data.tipoGolpe}</strong><br>Denúncias: <strong>${data.totalDenuncias}</strong><br>Não forneça dados pessoais!`;
+        } else {
+          div.className = 'resultado seguro';
+          document.getElementById('resultadoTitulo').innerHTML = '✅ Número não encontrado';
+          document.getElementById('resultadoTexto').innerHTML = 'Este número não está na nossa base. Mesmo assim, fique atento!';
+        }
+      } catch {
+        div.className = 'resultado seguro';
+        document.getElementById('resultadoTitulo').innerHTML = '✅ Número não encontrado';
+        document.getElementById('resultadoTexto').innerHTML = 'Este número não está na nossa base. Mesmo assim, fique atento!';
+      }
+    } catch(e) { alert('Erro ao conectar com a API.'); }
+  }
+
+  async function registrarDenuncia() {
+    const numero = document.getElementById('denNumero').value.trim();
+    const tipoContato = document.getElementById('denTipoContato').value;
+    const tipoGolpe = document.getElementById('denTipoGolpe').value;
+    const bancoMencionado = document.getElementById('denBanco').value;
+    const oQuePediu = document.getElementById('denOQuePediu').value;
+    const data = document.getElementById('denData').value;
+    const descricao = document.getElementById('denDescricao').value.trim();
+    const alerta = document.getElementById('alertaDenuncia');
+    alerta.className = 'alert-inline';
+
+    if (!numero || !tipoContato || !tipoGolpe) {
+      alerta.textContent = 'Preencha pelo menos o número, tipo de contato e tipo de golpe!';
+      alerta.className = 'alert-inline error';
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/api/denuncias`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          numero,
+          tipoContato,
+          tipoGolpe,
+          bancoMencionado: bancoMencionado || null,
+          oQuePediu: oQuePediu || null,
+          dataOcorrencia: data || null,
+          descricao: descricao || null
+        })
+      });
+      if (res.ok) {
+        alerta.textContent = '✅ Denúncia registrada! Obrigado por ajudar a proteger outras pessoas.';
+        alerta.className = 'alert-inline success';
+        document.getElementById('denNumero').value = '';
+        document.getElementById('denTipoContato').value = '';
+        document.getElementById('denTipoGolpe').value = '';
+        document.getElementById('denBanco').value = '';
+        document.getElementById('denOQuePediu').value = '';
+        document.getElementById('denData').value = '';
+        document.getElementById('denDescricao').value = '';
+      } else {
+        alerta.textContent = 'Erro ao registrar. Tente novamente.';
+        alerta.className = 'alert-inline error';
+      }
+    } catch(e) {
+      alerta.textContent = 'Erro ao conectar com a API.';
+      alerta.className = 'alert-inline error';
+    }
+  }
+
+  async function iniciarSimulacao() {
+    const perfil = usuarioLogado ? usuarioLogado.perfil : 'adulto';
+    try {
+      const res = await fetch(`${API}/api/simulacoes/perfil/${perfil}`);
+      perguntas = await res.json();
+      if (perguntas.length === 0) { alert('Nenhuma simulação disponível.'); return; }
+      indexAtual = 0;
+      pontuacao = 0;
+      erros = [];
+      document.getElementById('simInicio').style.display = 'none';
+      document.getElementById('simJogo').style.display = 'block';
+      document.getElementById('simResultado').style.display = 'none';
+      mostrarPergunta();
+    } catch(e) { alert('Erro ao carregar simulação.'); }
+  }
+
+  function mostrarPergunta() {
+    const s = perguntas[indexAtual];
+    const total = perguntas.length;
+    const pct = ((indexAtual) / total) * 100;
+
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('simCounter').textContent = `Pergunta ${indexAtual + 1} de ${total}`;
+
+    document.getElementById('simPergunta').innerHTML = `
+      <div class="sim-pergunta">
+        <div class="sim-texto">"${s.descricao}"</div>
+        <div class="sim-botoes">
+          <button class="sim-btn" id="btnGolpe" onclick="responder(true)">🚨 É golpe</button>
+          <button class="sim-btn" id="btnLegitimo" onclick="responder(false)">✅ É legítimo</button>
+        </div>
+        <div class="sim-feedback" id="feedback"></div>
+        <button class="sim-avancar" id="btnAvancar" onclick="avancar()">
+          ${indexAtual + 1 < total ? 'Próxima pergunta →' : 'Ver resultado'}
+        </button>
+      </div>
+    `;
+  }
+
+  function responder(achouGolpe) {
+    const s = perguntas[indexAtual];
+    const eGolpe = s.egolpe === true || s.egolpe === 'true' || s.eGolpe === true || s.eGolpe === 'true';
+    const acertou = achouGolpe === eGolpe;
+
+    document.getElementById('btnGolpe').disabled = true;
+    document.getElementById('btnLegitimo').disabled = true;
+
+    const btnClicado = achouGolpe ? document.getElementById('btnGolpe') : document.getElementById('btnLegitimo');
+    btnClicado.classList.add(acertou ? 'selecionado-certo' : 'selecionado-errado');
+
+    const feedback = document.getElementById('feedback');
+    feedback.style.display = 'block';
+
+    if (acertou) {
+      pontuacao++;
+      feedback.className = 'sim-feedback acertou';
+      feedback.innerHTML = `<strong>✅ Você acertou!</strong><br>${s.explicacao}`;
+    } else {
+      erros.push(s);
+      feedback.className = 'sim-feedback errou';
+      feedback.innerHTML = `<strong>❌ Você errou!</strong><br>${s.explicacao}`;
+    }
+
+    document.getElementById('btnAvancar').style.display = 'block';
+  }
+
+  function avancar() {
+    indexAtual++;
+    if (indexAtual < perguntas.length) {
+      mostrarPergunta();
+    } else {
+      mostrarResultado();
+    }
+  }
+
+  function mostrarResultado() {
+    document.getElementById('simJogo').style.display = 'none';
+    const total = perguntas.length;
+    const pct = Math.round((pontuacao / total) * 100);
+    const perfil = usuarioLogado ? usuarioLogado.perfil : 'adulto';
+
+    let emoji, nivel, msg, cor;
+    if (pct === 100) {
+      emoji = '🏆'; nivel = 'Expert em segurança!'; cor = '#f0fff4';
+      msg = 'Parabéns! Você identificou todos os golpes corretamente. Você está muito bem protegido!';
+    } else if (pct >= 70) {
+      emoji = '😊'; nivel = 'Bem protegido'; cor = '#f0fff4';
+      msg = 'Muito bem! Você tem bom conhecimento sobre golpes, mas ainda há espaço pra melhorar.';
+    } else if (pct >= 40) {
+      emoji = '⚠️'; nivel = 'Vulnerável'; cor = '#fffbe6';
+      msg = 'Atenção! Você pode ser alvo fácil de golpistas. Fique mais atento aos sinais de alerta.';
+    } else {
+      emoji = '🚨'; nivel = 'Alto risco!'; cor = '#fff0f0';
+      msg = 'Cuidado! Você errou a maioria das questões. Estude mais sobre golpes digitais para se proteger.';
+    }
+
+    let msgPerfil = '';
+    if (perfil === 'idoso') msgPerfil = '👴 Dica especial: desconfie sempre de ligações pedindo dados ou solicitando que envie seu cartão.';
+    else if (perfil === 'jovem') msgPerfil = '👦 Dica especial: cuidado com links de prêmios e pedidos de dados em processos seletivos.';
+    else msgPerfil = '👤 Dica especial: nunca instale aplicativos ou forneça senhas a pedido de ligações bancárias.';
+
+    let listaErros = '';
+    if (erros.length > 0) {
+      listaErros = `
+        <div class="sim-erros">
+          <h3>📋 Questões que você errou:</h3>
+          ${erros.map(e => `
+            <div class="sim-erro-item">
+              <p>"${e.descricao}"</p>
+              <span>💡 ${e.explicacao}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    document.getElementById('simResultado').style.display = 'block';
+    document.getElementById('simResultado').innerHTML = `
+      <div class="card sim-resultado" style="background: ${cor};">
+        <div style="font-size:56px;">${emoji}</div>
+        <h2>${nivel}</h2>
+        <p style="font-size:20px; font-weight:700; color:#1a1a2e;">${pontuacao} de ${total} corretas (${pct}%)</p>
+        <p>${msg}</p>
+        <p style="font-size:13px; background:white; padding:12px; border-radius:10px; margin-top:8px;">${msgPerfil}</p>
+        ${listaErros}
+        <button class="btn-form" style="margin-top:20px;" onclick="reiniciarSimulacao()">🔄 Tentar novamente</button>
+      </div>
+    `;
+  }
+
+  function reiniciarSimulacao() {
+    document.getElementById('simResultado').style.display = 'none';
+    document.getElementById('simInicio').style.display = 'block';
+  }
+</script>
+</body>
+</html>

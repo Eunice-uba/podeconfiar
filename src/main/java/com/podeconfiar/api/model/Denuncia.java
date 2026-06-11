@@ -17,6 +17,21 @@ public class Denuncia {
 
     private String descricao;
 
+    @Column(name = "tipo_golpe")
+    private String tipoGolpe;
+
+    @Column(name = "tipo_contato")
+    private String tipoContato;
+
+    @Column(name = "banco_mencionado")
+    private String bancoMencionado;
+
+    @Column(name = "o_que_pediu")
+    private String oQuePediu;
+
+    @Column(name = "valor_perdido")
+    private Double valorPerdido;
+
     @Column(name = "data_ocorrencia")
     private LocalDate dataOcorrencia;
 
@@ -31,6 +46,21 @@ public class Denuncia {
 
     public String getDescricao() { return descricao; }
     public void setDescricao(String descricao) { this.descricao = descricao; }
+
+    public String getTipoGolpe() { return tipoGolpe; }
+    public void setTipoGolpe(String tipoGolpe) { this.tipoGolpe = tipoGolpe; }
+
+    public String getTipoContato() { return tipoContato; }
+    public void setTipoContato(String tipoContato) { this.tipoContato = tipoContato; }
+
+    public String getBancoMencionado() { return bancoMencionado; }
+    public void setBancoMencionado(String bancoMencionado) { this.bancoMencionado = bancoMencionado; }
+
+    public String getOQuePediu() { return oQuePediu; }
+    public void setOQuePediu(String oQuePediu) { this.oQuePediu = oQuePediu; }
+
+    public Double getValorPerdido() { return valorPerdido; }
+    public void setValorPerdido(Double valorPerdido) { this.valorPerdido = valorPerdido; }
 
     public LocalDate getDataOcorrencia() { return dataOcorrencia; }
     public void setDataOcorrencia(LocalDate dataOcorrencia) { this.dataOcorrencia = dataOcorrencia; }

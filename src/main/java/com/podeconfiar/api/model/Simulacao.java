@@ -22,6 +22,12 @@ public class Simulacao {
     @Column(nullable = false)
     private String explicacao;
 
+    @Column(name = "tipo")
+    private String tipo;
+
+    @Column(name = "canal")
+    private String canal;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -36,4 +42,10 @@ public class Simulacao {
 
     public String getExplicacao() { return explicacao; }
     public void setExplicacao(String explicacao) { this.explicacao = explicacao; }
+
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
+
+    public String getCanal() { return canal; }
+    public void setCanal(String canal) { this.canal = canal; }
 }
